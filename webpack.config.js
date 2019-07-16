@@ -2,28 +2,28 @@ var webpack = require('webpack')
 var path = require('path')
 
 module.exports = {
-    entry: path.join(__dirname, './src/InputMask.js'),
-
+    entry: './src/index.ts',
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js']
+    },
     module: {
-        loaders: [
-            { test: /\.js$/, loaders: ['babel-loader'] }
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/
+            }
         ]
     },
 
     output: {
-        path: path.join(__dirname, './dist'),
-        filename: 'InputMask.js',
-        library: 'InputMask',
-        libraryTarget: 'umd'
+        filename: 'is-text-utils.js',
+        library: 'is-text-utils',
+        libraryTarget: 'umd',
+        path: path.resolve(__dirname, 'dist')
     },
-
-    resolve: {
-        extensions: ['', '.js']
-    },
-
-    plugins: [
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify('production')
-        })
-    ]
+    node: {
+        module: "empty",
+        fs: "empty"
+    }
 }

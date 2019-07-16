@@ -1,12 +1,25 @@
-import createTextMaskInputElement from 'text-mask-core/src/createTextMaskInputElement'
-import emailMask from 'text-mask-addons/src/emailMask';
-import * as IBAN from 'iban';
+const _textMaskCore = require('text-mask-core');
+const _createTextMaskInputElement = _textMaskCore.createTextMaskInputElement;
+const emailMask = require('text-mask-addons').emailMask;
+const _conformToMask = _textMaskCore.conformToMask;
+const _iban = require('iban');
+import { stripDiacritics } from './diactritics';
 
+export interface ITextMaskConfig {
+    mask: any,
+    guide: boolean,
+    placeholderChar: string,
+    pipe: any,
+    keepCharPositions: boolean,
+    showMask: boolean;
+    validate: (value: string) => boolean
+}
 
-function createValidationRegex(xeeloMask) {
+function createValidationRegex(xeeloMask: string) {
     const ret = [];
     let isFixed = false;
     let hadFirstNumber = xeeloMask.match(/^[#\.\,9]+$/) === null; // allow negative numbers in "pure numeric" masks
+    const isDecimal = xeeloMask.indexOf('#') > -1 && xeeloMask.indexOf('.') > 0;
     for (var i = 0; i < xeeloMask.length; i++) {
         const char = xeeloMask[i];
         if (char === '[') {
@@ -30,6 +43,10 @@ function createValidationRegex(xeeloMask) {
             ret.push('\\d');
             continue;
         }
+        if (char === '.') {
+            isDecimal ? ret.push('\\.?') : ret.push('\\.');
+            continue;
+        }
         if (char === '#') {
             if (!hadFirstNumber) {
                 hadFirstNumber = true;
@@ -39,28 +56,28 @@ function createValidationRegex(xeeloMask) {
             continue;
         }
         if (char === 'a') {
-            ret.push('[a-z]');
+            ret.push('[a-ž]');
             continue;
         }
         if (char === 'b') {
-            ret.push('[a-z]?');
+            ret.push('[a-ž]?');
             continue;
         }
         if (char === 'A') {
-            ret.push('[A-Z]');
+            ret.push('[A-Ž]');
             continue;
         }
         if (char === 'B') {
-            ret.push('[A-Z]?');
+            ret.push('[A-Ž]?');
             continue;
         }
         if (char === 'w') {
-            ret.push('[a-z]|[A-Z]|[0-9]');
+            ret.push('[0-9A-Ža-ž]');
             continue;
 
         }
         if (char === 'x') {
-            ret.push('([a-z]|[A-Z]|[0-9])?');
+            ret.push('([0-9A-Ža-ž])?');
             continue;
         }
         if (char === '*') {
@@ -79,22 +96,25 @@ function createValidationRegex(xeeloMask) {
 }
 
 
-function transformMask(xeeloMask) {
+function transformMask(xeeloMask: string, options?: Partial<ITextMaskConfig>): ITextMaskConfig {
 
     const re = createValidationRegex(xeeloMask);
 
-    const config = {
+    const config: ITextMaskConfig = Object.assign({
         mask: false,
         guide: false,
         placeholderChar: '_',
         pipe: undefined,
+        showMask: false,
         keepCharPositions: false,
-        validate: function(value) {
-            return re.test(value);
+        validate: function (value: string): boolean {
+            const result = re.test(value);
+            // console.log(re, value, result);
+            return result;
         }
-    };
+    }, options);
 
-    config.mask = function(rawValue, config) {
+    config.mask = function (rawValue: string, config: any) {
         const position = config.currentCarretPosition;
 
         const hasOptionalChars = xeeloMask.match(/[#bBx%]+/) !== null;
@@ -143,28 +163,28 @@ function transformMask(xeeloMask) {
                 continue;
             }
             if (char === 'a') {
-                ret.push(/[a-z]/);
+                ret.push(/[a-ž]/);
                 continue;
             }
             if (char === 'b') {
-                ret.push(/[a-z]/);
+                ret.push(/[a-ž]/);
                 continue;
             }
             if (char === 'A') {
-                ret.push(/[A-Z]/);
+                ret.push(/[A-Ž]/);
                 continue;
             }
             if (char === 'B') {
-                ret.push(/[A-Z]/);
+                ret.push(/[A-Ž]/);
                 continue;
             }
             if (char === 'w') {
-                ret.push(/[a-z]|[A-Z]|[0-9]/);
+                ret.push(/[0-9A-Ža-ž]/);
                 continue;
 
             }
             if (char === 'x') {
-                ret.push(/([a-z]|[A-Z]|[0-9])/);
+                ret.push(/([0-9A-Ža-ž])/);
                 continue;
             }
             if (char === '*') {
@@ -183,58 +203,40 @@ function transformMask(xeeloMask) {
     return config;
 }
 
-export function createTextMaskConfig(inputMask) {
+export function createTextMaskConfig(inputMask: string, options?: Partial<ITextMaskConfig>): ITextMaskConfig {
     if (inputMask === 'email') {
-        const config = Object.assign({
+        const config: ITextMaskConfig = Object.assign({
             mask: false,
             guide: false,
             placeholderChar: '_',
             pipe: undefined,
+            showMask: false,
             keepCharPositions: false,
-            validate: function(value) {
+            validate: (value: string): boolean => {
                 const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                 return re.test(String(value).toLowerCase());
             }
-        }, emailMask);
+        }, options, emailMask);
         return config;
     }
 
     if (inputMask === 'iban') {
-        const config = {
+        const config: ITextMaskConfig = Object.assign({
             mask: false,
             guide: false,
+            showMask: false,
             placeholderChar: '_',
             pipe: undefined,
             keepCharPositions: false,
-            validate: function(value) {
-                return IBAN.isValid(value);
+            validate: (value: string): boolean => {
+                return _iban.isValid(value);
             }
-        };
+        }, options);
         return config;
     }
 
-    return transformMask(inputMask);
+    return transformMask(inputMask, options);
 }
 
-
-export function inputMask(mask) {
-    const { inputElement } = createTextMaskConfig(mask)
-    const textMaskInputElement = createTextMaskInputElement(textMaskConfig)
-    const inputHandler = ({ target: { value } }) => textMaskInputElement.update(value)
-
-    inputElement.addEventListener('input', inputHandler)
-
-    textMaskInputElement.update(inputElement.value)
-
-    return {
-        textMaskInputElement,
-
-        destroy() {
-            inputElement.removeEventListener('input', inputHandler)
-        }
-    }
-}
-
-export default inputMask;
-export { default as createTextMaskInputElement } from 'text-mask-core/src/createTextMaskInputElement.js';
-export { default as conformToMask } from 'text-mask-core/src/conformToMask.js';
+export { _createTextMaskInputElement as createTextMaskInputElement };
+export { _conformToMask as conformToMask };
