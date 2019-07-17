@@ -3,7 +3,9 @@ const _createTextMaskInputElement = _textMaskCore.createTextMaskInputElement;
 const emailMask = require('text-mask-addons').emailMask;
 const _conformToMask = _textMaskCore.conformToMask;
 const _iban = require('iban');
-import { stripDiacritics } from './diactritics';
+const LOWERCASE = 'a-zěéęščřžýáíüůöőćß';
+const UPPERCASE = 'A-ZĚŽŠČŔĎŤŇÚÁÉÍÓŚÄÖÜ';
+const LETTER = `[0-9${LOWERCASE}${UPPERCASE}]`;
 
 export interface ITextMaskConfig {
     mask: any,
@@ -56,28 +58,28 @@ function createValidationRegex(xeeloMask: string) {
             continue;
         }
         if (char === 'a') {
-            ret.push('[a-ž]');
+            ret.push(`[${LOWERCASE}]`);
             continue;
         }
         if (char === 'b') {
-            ret.push('[a-ž]?');
+            ret.push(`[${LOWERCASE}]?`);
             continue;
         }
         if (char === 'A') {
-            ret.push('[A-Ž]');
+            ret.push(`[${UPPERCASE}]`);
             continue;
         }
         if (char === 'B') {
-            ret.push('[A-Ž]?');
+            ret.push(`[${UPPERCASE}]?`);
             continue;
         }
         if (char === 'w') {
-            ret.push('[0-9A-Ža-ž]');
+            ret.push(LETTER);
             continue;
 
         }
         if (char === 'x') {
-            ret.push('([0-9A-Ža-ž])?');
+            ret.push(`(${LETTER})?`);
             continue;
         }
         if (char === '*') {
@@ -163,28 +165,27 @@ function transformMask(xeeloMask: string, options?: Partial<ITextMaskConfig>): I
                 continue;
             }
             if (char === 'a') {
-                ret.push(/[a-ž]/);
+                ret.push(new RegExp(`[${LOWERCASE}]`));
                 continue;
             }
             if (char === 'b') {
-                ret.push(/[a-ž]/);
+                ret.push(new RegExp(`[${LOWERCASE}]`));
                 continue;
             }
             if (char === 'A') {
-                ret.push(/[A-Ž]/);
+                ret.push(new RegExp(`[${UPPERCASE}]`));
                 continue;
             }
             if (char === 'B') {
-                ret.push(/[A-Ž]/);
+                ret.push(new RegExp(`[${UPPERCASE}]`));
                 continue;
             }
             if (char === 'w') {
-                ret.push(/[0-9A-Ža-ž]/);
+                ret.push(new RegExp(`${LETTER}`));
                 continue;
-
             }
             if (char === 'x') {
-                ret.push(/([0-9A-Ža-ž])/);
+                ret.push(new RegExp(`${LETTER}`));
                 continue;
             }
             if (char === '*') {

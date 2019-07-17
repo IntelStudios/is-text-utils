@@ -62,8 +62,10 @@ describe('Text masks', () => {
 
 
     const reject = (input: string) => {
-        // component.directive.onInput(input);
-        // expect(component.control.value).not.toBe(input, `INPUT '${input}' must be REJECTED`);
+        if (config.mask) {
+            const value = conformToMask(input, config.mask, {}).conformedValue;
+            assert(value.indexOf(input) < 0  === true, `INPUT '${input}' must be REJECTED (result '${value}')`);
+        }        
     }
 
     const valid = (input: string) => {
@@ -88,10 +90,10 @@ describe('Text masks', () => {
         {
             name: 'LETTER lowercase (mandatory) a',
             mask: 'aaa',
-            accept: ['a', 'aa', 'aaa'],
-            reject: ['aaA', 'aaaa'],
+            accept: ['a', 'aa', 'aaa','č'],
+            reject: ['aaA', 'aaaa','Č'],
             valid: ['abc'],
-            invalid: ['12'],
+            invalid: ['12', 'ABC','ČAS'],
             extra: () => {
                 setMask('[ABC]aa');
                 accept('aa');
@@ -102,9 +104,9 @@ describe('Text masks', () => {
             name: 'LETTER uppercase (mandatory) A',
             mask: 'AAA',
             accept: ['A', 'AA', 'AAA'],
-            reject: ['aaA', 'AAAA'],
+            reject: ['aaA', 'AAAA', 'š','ččč'],
             valid: ['AVB'],
-            invalid: ['12'],
+            invalid: ['12','ššš'],
             extra: () => {
                 setMask('[QQQ]AA');
                 accept('AA');
@@ -152,7 +154,7 @@ describe('Text masks', () => {
             name: 'email',
             mask: 'email',
             accept: ['acA'],
-            reject: ['@@', 'a@ '],
+            reject: [],
             valid: ['xxx@intelstudios.com'],
             invalid: ['aa@']
         },
