@@ -3,8 +3,8 @@ const _createTextMaskInputElement = _textMaskCore.createTextMaskInputElement;
 const emailMask = require('text-mask-addons').emailMask;
 const _conformToMask = _textMaskCore.conformToMask;
 const _iban = require('iban');
-const LOWERCASE = 'a-zěéęščřžýáíüůöőćß';
-const UPPERCASE = 'A-ZĚŽŠČŔĎŤŇÚÁÉÍÓŚÄÖÜ';
+const LOWERCASE = 'a-zěéęščřžýáíüúůöőćß';
+const UPPERCASE = 'A-ZĚŽŠČŘŔĎŤŇÚÁÉÍÝÓŚÄÖÜŮ';
 const LETTER = `[0-9${LOWERCASE}${UPPERCASE}]`;
 
 export interface ITextMaskConfig {
