@@ -1,6 +1,7 @@
+import { expect } from 'chai';
 import { describe } from 'mocha';
-import { createTextMaskConfig, conformToMask, ITextMaskConfig } from './InputMask';
-const { assert } = require('chai');
+
+import { conformToMask, createTextMaskConfig, ITextMaskConfig } from './InputMask';
 
 interface IMaskTest {
     name: string,
@@ -15,29 +16,35 @@ interface IMaskTest {
 describe('Create config', () => {
     it('Should create with defaults', () => {
         const config = createTextMaskConfig('A');
-        assert(config.placeholderChar === '_', `Config must be created with default placeholder char`);
+        expect(config.maskType).to.eq('custom');
+        expect(config.placeholderChar).to.eq('_', `Config must be created with default placeholder char`);
     });
     it('Should create IBAN with defaults', () => {
         const config = createTextMaskConfig('iban');
-        assert(config.placeholderChar === '_', `Config must be created with default placeholder char`);
+        expect(config.maskType).to.eq('iban');
+        expect(config.placeholderChar).to.eq('_', `Config must be created with default placeholder char`);
     });
     it('Should create EMAIL with defaults', () => {
         const config = createTextMaskConfig('email');
-        assert(config.placeholderChar === '_', `Config must be created with default placeholder char`);
+        expect(config.maskType).to.eq('email');
+        expect(config.placeholderChar).to.eq('_', `Config must be created with default placeholder char`);
     });
 
     it('Should create with options', () => {
-        const config = createTextMaskConfig('A', {placeholderChar: '@'});
-        assert(config.placeholderChar === '@', `Config must be created with @ placeholder char`);
+        const config = createTextMaskConfig('A', { placeholderChar: '@' });
+        expect(config.maskType).to.eq('custom');
+        expect(config.placeholderChar).to.eq('@', `Config must be created with @ placeholder char`);
     });
     it('Should create IBAN with options', () => {
-        const config = createTextMaskConfig('iban', {placeholderChar: '@'});
-        assert(config.placeholderChar === '@', `Config must be created with @ placeholder char`);
+        const config = createTextMaskConfig('iban', { placeholderChar: '@' });
+        expect(config.maskType).to.eq('iban');
+        expect(config.placeholderChar).to.eq('@', `Config must be created with @ placeholder char`);
     });
     it('Should create EMAIL with options', () => {
-        const config = createTextMaskConfig('email', {placeholderChar: '@'});
-        assert(config.placeholderChar === '@', `Config must be created with @ placeholder char`);
-    });        
+        const config = createTextMaskConfig('email', { placeholderChar: '@' });
+        expect(config.maskType).to.eq('email');
+        expect(config.placeholderChar).to.eq('@', `Config must be created with @ placeholder char`);
+    });
 });
 
 describe('Text masks', () => {
@@ -52,30 +59,30 @@ describe('Text masks', () => {
     const accept = (input: string) => {
         if (config.mask) {
             const value = conformToMask(input, config.mask, {}).conformedValue;
-            assert(value.indexOf(input) > -1 === true, `INPUT '${input}' must be ACCEPTED (result '${value}')`);
+            expect(value.indexOf(input) > -1).to.eq(true, `INPUT '${input}' must be ACCEPTED (result '${value}')`);
         }
     }
 
     const value = (output: string) => {
-        // expect(component.control.value).toBe(output);
+        // expect(component.control.value).to.eq(output);
     }
 
 
     const reject = (input: string) => {
         if (config.mask) {
             const value = conformToMask(input, config.mask, {}).conformedValue;
-            assert(value.indexOf(input) < 0  === true, `INPUT '${input}' must be REJECTED (result '${value}')`);
-        }        
+            expect(value.indexOf(input) < 0).to.eq(true, `INPUT '${input}' must be REJECTED (result '${value}')`);
+        }
     }
 
     const valid = (input: string) => {
         const result = config.validate(input);
-        assert(result === true, `INPUT '${input}' must be VALID`);
+        expect(result).to.eq(true, `INPUT '${input}' must be VALID`);
     }
 
     const invalid = (input: string) => {
         const result = config.validate(input);
-        assert(result === false, `INPUT '${input}' must be INVALID`);
+        expect(result).to.eq(false, `INPUT '${input}' must be INVALID`);
     }
 
     const tests: IMaskTest[] = [
@@ -90,10 +97,10 @@ describe('Text masks', () => {
         {
             name: 'LETTER lowercase (mandatory) a',
             mask: 'aaa',
-            accept: ['a', 'aa', 'aaa','č'],
-            reject: ['aaA', 'aaaa','Č'],
+            accept: ['a', 'aa', 'aaa', 'č'],
+            reject: ['aaA', 'aaaa', 'Č'],
             valid: ['abc'],
-            invalid: ['12', 'ABC','ČAS'],
+            invalid: ['12', 'ABC', 'ČAS'],
             extra: () => {
                 setMask('[ABC]aa');
                 accept('aa');
@@ -104,9 +111,9 @@ describe('Text masks', () => {
             name: 'LETTER uppercase (mandatory) A',
             mask: 'AAA',
             accept: ['A', 'AA', 'AAA'],
-            reject: ['aaA', 'AAAA', 'š','ččč'],
+            reject: ['aaA', 'AAAA', 'š', 'ččč'],
             valid: ['AVB'],
-            invalid: ['12','ššš'],
+            invalid: ['12', 'ššš'],
             extra: () => {
                 setMask('[QQQ]AA');
                 accept('AA');

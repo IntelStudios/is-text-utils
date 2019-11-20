@@ -8,11 +8,12 @@ const UPPERCASE = 'A-ZĚŽŠČŘŔĎŤŇÚÁÉÍÝÓŚÄÖÜŮ';
 const LETTER = `[0-9${LOWERCASE}${UPPERCASE}]`;
 
 export interface ITextMaskConfig {
-    mask: any,
-    guide: boolean,
-    placeholderChar: string,
-    pipe: any,
-    keepCharPositions: boolean,
+    maskType: 'custom' | 'iban' | 'email';
+    mask: any;
+    guide: boolean;
+    placeholderChar: string;
+    pipe: any;
+    keepCharPositions: boolean;
     showMask: boolean;
     validate: (value: string) => boolean
 }
@@ -103,6 +104,7 @@ function transformMask(xeeloMask: string, options?: Partial<ITextMaskConfig>): I
     const re = createValidationRegex(xeeloMask);
 
     const config: ITextMaskConfig = Object.assign({
+        maskType: 'custom',
         mask: false,
         guide: false,
         placeholderChar: '_',
@@ -207,6 +209,7 @@ function transformMask(xeeloMask: string, options?: Partial<ITextMaskConfig>): I
 export function createTextMaskConfig(inputMask: string, options?: Partial<ITextMaskConfig>): ITextMaskConfig {
     if (inputMask === 'email') {
         const config: ITextMaskConfig = Object.assign({
+            maskType: 'email',
             mask: false,
             guide: false,
             placeholderChar: '_',
@@ -223,6 +226,7 @@ export function createTextMaskConfig(inputMask: string, options?: Partial<ITextM
 
     if (inputMask === 'iban') {
         const config: ITextMaskConfig = Object.assign({
+            maskType: 'iban',
             mask: false,
             guide: false,
             showMask: false,
