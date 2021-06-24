@@ -27,7 +27,7 @@
     "antlr4-tool": "^1.0.26",
     "chai": "^4.2.0",
     "csv-reader": "^1.0.3",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.3",
     "mocha": "^6.1.4",
     "mocha-junit-reporter": "^1.22.0",
     "mocha-multi-reporters": "^1.1.7",
