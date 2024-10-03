@@ -13,6 +13,7 @@
     ]
   },
   "dependencies": {
+    "esbuild": "^0.24.0",
     "iban": "0.0.12",
     "text-mask-addons": "^3.8.0",
     "text-mask-core": "^5.1.2"
@@ -56,7 +57,7 @@
     "url": "https://github.com/IntelStudios/text-utils.git"
   },
   "scripts": {
-    "build": "./node_modules/.bin/webpack -p --config webpack.config.js",
+    "build" : "node ./build.mjs",
     "build.publish": "npm run test && npm run build && npm publish",
     "test": "ts-mocha -p tsconfig.test.json src/**.spec.ts"
   },
