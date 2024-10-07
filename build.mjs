@@ -10,6 +10,6 @@ function createBuildSettings(options){
     }
 }
 
-const settings = createBuildSettings({ minify : true });
+const settings = createBuildSettings({ minify : false });
 
 await esbuild.build(settings);

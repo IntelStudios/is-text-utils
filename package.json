@@ -3,15 +3,6 @@
   "bugs": {
     "url": "https://github.com/IntelStudios/text-utils/issues"
   },
-  "babel": {
-    "presets": [
-      "es2015",
-      "stage-0"
-    ],
-    "plugins": [
-      "transform-object-assign"
-    ]
-  },
   "dependencies": {
     "esbuild": "^0.24.0",
     "iban": "0.0.12",
@@ -51,6 +42,7 @@
   "license": "Unlicense",
   "main": "dist/is-text-utils.js",
   "name": "@intelstudios/text-utils",
+  "type" : "module",
   "typings": "src/index.ts",
   "repository": {
     "type": "git",
@@ -58,8 +50,9 @@
   },
   "scripts": {
     "build" : "node ./build.mjs",
+    "build.package" : "npm run test && npm run build && npm pack",
     "build.publish": "npm run test && npm run build && npm publish",
-    "test": "ts-mocha -p tsconfig.test.json src/**.spec.ts"
+    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' ts-mocha -p tsconfig.test.json src/**.spec.ts"
   },
   "version": "1.1.2"
 }
