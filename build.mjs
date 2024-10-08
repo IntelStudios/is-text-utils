@@ -3,7 +3,7 @@ import esbuild from 'esbuild';
 function createBuildSettings(options){
     return {
         entryPoints : ['src/index.ts'],
-        outfile : 'dist/is-test-utils.js',
+        outfile : 'dist/is-text-utils.js',
         format : 'esm',
         bundle : true,
         ...options
