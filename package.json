@@ -54,5 +54,5 @@
     "build.publish": "npm run test && npm run build && npm publish",
     "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' ts-mocha -p tsconfig.test.json src/**.spec.ts"
   },
-  "version": "1.1.2"
+  "version": "2.0.0"
 }
